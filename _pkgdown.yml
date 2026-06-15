@@ -1,0 +1,21 @@
+url: https://adrientaudiere.github.io/phylopq/
+
+template:
+  package: phylopq
+
+reference:
+  - title: "Phylogenetic analysis for phyloseq"
+    desc: >
+      Functions for tree construction, phylogenetic distances and
+      phylogeny-aware visualisations of 'phyloseq' objects.
+
+navbar:
+  structure:
+    left:
+      - home
+      - intro
+      - reference
+      - articles
+      - news
+    right:
+      - github

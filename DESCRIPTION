@@ -1,0 +1,36 @@
+Package: phylopq
+Title: Phylogenetic Analysis for 'phyloseq' Objects
+Version: 0.0.0.9000
+Authors@R:
+    person("Adrien", "Taudière", , "adrien.taudiere@zaclys.net", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0000-0003-1088-1182"))
+Description: A phylogenetic analysis layer for 'phyloseq' objects within the
+    'pqverse' ecosystem. Provides helpers for tree construction from
+    taxonomy tables, phylogenetic distance metrics, phylogeny-aware
+    ordinations and visualisations, and integration with external
+    phylogenetic placement tools. Built on top of 'phyloseq', 'ape' and
+    'MiscMetabar'.
+License: MIT + file LICENSE
+URL: https://adrientaudiere.github.io/phylopq/,
+    https://github.com/adrientaudiere/phylopq
+BugReports: https://github.com/adrientaudiere/phylopq/issues
+Depends:
+    R (>= 4.1.0),
+    phyloseq
+Imports:
+    ape,
+    cli,
+    lifecycle,
+    methods,
+    stats,
+    utils
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RdMacros: lifecycle
+Config/roxygen2/version: 8.0.0
