@@ -10,7 +10,7 @@ Description: A phylogenetic analysis layer for 'phyloseq' objects within the
     ordinations and visualisations, and integration with external
     phylogenetic placement tools. Built on top of 'phyloseq', 'ape' and
     'MiscMetabar'.
-License: MIT + file LICENSE
+License: AGPL-3
 URL: https://adrientaudiere.github.io/phylopq/,
     https://github.com/adrientaudiere/phylopq
 BugReports: https://github.com/adrientaudiere/phylopq/issues
