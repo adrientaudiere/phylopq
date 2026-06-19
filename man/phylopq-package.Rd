@@ -6,6 +6,8 @@
 \alias{phylopq-package}
 \title{phylopq: Phylogenetic Analysis for 'phyloseq' Objects}
 \description{
+\if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
+
 A phylogenetic analysis layer for 'phyloseq' objects within the 'pqverse' ecosystem. Provides helpers for tree construction from taxonomy tables, phylogenetic distance metrics, phylogeny-aware ordinations and visualisations, and integration with external phylogenetic placement tools. Built on top of 'phyloseq', 'ape' and 'MiscMetabar'.
 }
 \seealso{

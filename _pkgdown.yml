@@ -1,7 +1,11 @@
 url: https://adrientaudiere.github.io/phylopq/
-
 template:
-  package: phylopq
+  bootstrap: 5
+  bslib:
+    bg: "#c5d8b0"
+    fg: "#0a1810"
+    primary: "#117743"
+    secondary: "#a36100"
 
 reference:
   - title: "Phylogenetic analysis for phyloseq"

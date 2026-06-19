@@ -1,0 +1,42 @@
+# phylopq
+
+`phylopq` is the **phylogenetic analysis** layer of the
+[pqverse](https://github.com/adrientaudiere) ecosystem. It operates on
+[`phyloseq`](https://joey711.github.io/phyloseq/) objects and builds on
+top of [`ape`](https://emmanuelparadis.github.io/) and
+[`MiscMetabar`](https://adrientaudiere.github.io/MiscMetabar/).
+
+## Status
+
+This package is in **early development** (version 0.0.0.9000). It is
+scaffolded but does not yet ship any functions. The first migrations
+will follow the [`phylopq` section of the pqverse
+ROADMAP](https://adrientaudiere.github.io/ROADMAP.html#phylopq--phylogenetic-analysis-for-phyloseq).
+
+## Installation
+
+You can install the development version of `phylopq` from GitHub with:
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("adrientaudiere/phylopq")
+```
+
+## Example
+
+``` r
+
+library(phylopq)
+library(phyloseq)
+data(GlobalPatterns, package = "phyloseq")
+```
+
+## Scope
+
+`phylopq` is for **phylogeny-aware** work on a single phyloseq object:
+tree construction from taxonomy tables, phylogenetic distance metrics,
+phylogeny-aware ordinations, and integration with external placement
+tools. It does not perform general statistical analysis (use `netaipq`),
+multi-phyloseq comparison (use `comparpq`) or pure ggplot2 wrappers (use
+`ggplotpq`).
