@@ -11,13 +11,13 @@ Source:
 [`DESCRIPTION`](https://github.com/adrientaudiere/phylopq/blob/HEAD/DESCRIPTION)
 
 Taudière A (2026). *phylopq: Phylogenetic Analysis for 'phyloseq'
-Objects*. R package version 0.0.0.9000,
+Objects*. R package version 0.1.0.9000,
 <https://adrientaudiere.github.io/phylopq/>.
 
     @Manual{,
       title = {phylopq: Phylogenetic Analysis for 'phyloseq' Objects},
       author = {Adrien Taudière},
       year = {2026},
-      note = {R package version 0.0.0.9000},
+      note = {R package version 0.1.0.9000},
       url = {https://adrientaudiere.github.io/phylopq/},
     }
