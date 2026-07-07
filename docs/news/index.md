@@ -1,6 +1,6 @@
 # Changelog
 
-## phylopq 0.1.0 (Development version)
+## phylopq 0.1.0
 
 - [`taxo2tree()`](https://adrientaudiere.github.io/phylopq/reference/taxo2tree.md)
   builds a “phylogenetic” `phylo` tree from the taxonomic ranks of a
