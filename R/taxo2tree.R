@@ -36,7 +36,7 @@
 #'   ranks = c("Domain", "Phylum", "Class", "Order", "Family", "Genus"),
 #'   internal_node_singletons = FALSE
 #' )
-#' 
+#'
 #' length(tree$node.label)
 #' length(tree_wo_singletons$node.label)
 #'
