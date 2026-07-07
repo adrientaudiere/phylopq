@@ -46,7 +46,7 @@ data(data_fungi_mini)
 tree <- taxo2tree(data_fungi_mini,
   ranks = c("Domain", "Phylum", "Class", "Order", "Family", "Genus")
 )
-tree
+plot(tree)
 
 # Without internal node singletons
 tree_wo_singletons <- taxo2tree(data_fungi_mini,
@@ -54,11 +54,16 @@ tree_wo_singletons <- taxo2tree(data_fungi_mini,
   internal_node_singletons = FALSE
 )
 
+length(tree$node.label)
+length(tree_wo_singletons$node.label)
+
 # Without taxa names (collapse identical paths)
 tree_no_taxa <- taxo2tree(data_fungi_mini,
   ranks = c("Domain", "Phylum", "Class", "Order", "Family", "Genus"),
   use_taxa_names = FALSE
 )
+ plot(tree_no_taxa)
+
 }
 
 \dontrun{

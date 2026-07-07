@@ -72,16 +72,8 @@ data(data_fungi_mini)
 tree <- taxo2tree(data_fungi_mini,
   ranks = c("Domain", "Phylum", "Class", "Order", "Family", "Genus")
 )
-tree
-#> 
-#> Phylogenetic tree with 45 tips and 56 internal nodes.
-#> 
-#> Tip labels:
-#>   ASV7, ASV8, ASV18, ASV26, ASV94, ASV93, ...
-#> Node labels:
-#>   Fungi, Basidiomycota, Agaricomycetes, Russulales, Stereaceae, Stereum, ...
-#> 
-#> Rooted; no branch length.
+plot(tree)
+
 
 # Without internal node singletons
 tree_wo_singletons <- taxo2tree(data_fungi_mini,
@@ -89,11 +81,19 @@ tree_wo_singletons <- taxo2tree(data_fungi_mini,
   internal_node_singletons = FALSE
 )
 
+length(tree$node.label)
+#> [1] 56
+length(tree_wo_singletons$node.label)
+#> [1] 18
+
 # Without taxa names (collapse identical paths)
 tree_no_taxa <- taxo2tree(data_fungi_mini,
   ranks = c("Domain", "Phylum", "Class", "Order", "Family", "Genus"),
   use_taxa_names = FALSE
 )
+ plot(tree_no_taxa)
+
+
 # }
 
 if (FALSE) { # \dontrun{
