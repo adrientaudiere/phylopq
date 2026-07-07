@@ -18,6 +18,7 @@ ROADMAP](https://adrientaudiere.github.io/ROADMAP.html#phylopq--phylogenetic-ana
 You can install the development version of `phylopq` from GitHub with:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("adrientaudiere/phylopq")
 ```
@@ -25,6 +26,7 @@ remotes::install_github("adrientaudiere/phylopq")
 ## Example
 
 ``` r
+
 library(phylopq)
 library(phyloseq)
 data(GlobalPatterns, package = "phyloseq")

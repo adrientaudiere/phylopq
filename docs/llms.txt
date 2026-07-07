@@ -18,6 +18,7 @@ ROADMAP](https://adrientaudiere.github.io/ROADMAP.html#phylopq--phylogenetic-ana
 You can install the development version of `phylopq` from GitHub with:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("adrientaudiere/phylopq")
 ```
@@ -25,6 +26,7 @@ remotes::install_github("adrientaudiere/phylopq")
 ## Example
 
 ``` r
+
 library(phylopq)
 library(phyloseq)
 data(GlobalPatterns, package = "phyloseq")
@@ -45,4 +47,7 @@ multi-phyloseq comparison (use `comparpq`) or pure ggplot2 wrappers (use
 
 Functions for tree construction, phylogenetic distances and
 phylogeny-aware visualisations of ‘phyloseq’ objects.
+
+- [`taxo2tree()`](https://adrientaudiere.github.io/phylopq/reference/taxo2tree.md)
+  : Convert taxonomy dataframe to phylogenetic tree
 
