@@ -29,6 +29,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
+Remotes:
+    adrientaudiere/MiscMetabar
 Config/testthat/edition: 3
 Encoding: UTF-8
 VignetteBuilder: knitr
