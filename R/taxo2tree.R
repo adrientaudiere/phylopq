@@ -1,8 +1,9 @@
 #' Convert taxonomy dataframe to phylogenetic tree
 #'
+#' @description
 #' <a href="https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle"> <img src="https://img.shields.io/badge/lifecycle-experimental-orange" alt="lifecycle-experimental"></a>
 #'
-#' @description Creates a phylo object from a taxonomy
+#' Creates a phylo object from a taxonomy
 #' table with hierarchical taxonomic ranks as columns.
 #'
 #' @param physeq (required) A \code{\link[phyloseq]{phyloseq-class}} object

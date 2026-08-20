@@ -33,11 +33,10 @@ structure without individual ASV/OTU names.}
 A phylo object (ape package) representing the taxonomic tree.
 }
 \description{
+\if{html}{\out{<a href="https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle">}} \if{html}{\out{<img src="https://img.shields.io/badge/lifecycle-experimental-orange" alt="lifecycle-experimental">}}\if{html}{\out{</a>}}
+
 Creates a phylo object from a taxonomy
 table with hierarchical taxonomic ranks as columns.
-}
-\details{
-\if{html}{\out{<a href="https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle">}} \if{html}{\out{<img src="https://img.shields.io/badge/lifecycle-experimental-orange" alt="lifecycle-experimental">}}\if{html}{\out{</a>}}
 }
 \examples{
 \donttest{
