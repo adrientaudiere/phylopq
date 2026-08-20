@@ -7,7 +7,12 @@
 <url><loc>https://adrientaudiere.github.io/phylopq/authors.html</loc></url>
 <url><loc>https://adrientaudiere.github.io/phylopq/index.html</loc></url>
 <url><loc>https://adrientaudiere.github.io/phylopq/news/index.html</loc></url>
+<url><loc>https://adrientaudiere.github.io/phylopq/reference/add_tree_pq.html</loc></url>
+<url><loc>https://adrientaudiere.github.io/phylopq/reference/delim_pq.html</loc></url>
 <url><loc>https://adrientaudiere.github.io/phylopq/reference/index.html</loc></url>
+<url><loc>https://adrientaudiere.github.io/phylopq/reference/is_delim_installed.html</loc></url>
+<url><loc>https://adrientaudiere.github.io/phylopq/reference/phylo_glom_pq.html</loc></url>
+<url><loc>https://adrientaudiere.github.io/phylopq/reference/phylo_glom_scan_pq.html</loc></url>
 <url><loc>https://adrientaudiere.github.io/phylopq/reference/phylopq-package.html</loc></url>
 <url><loc>https://adrientaudiere.github.io/phylopq/reference/taxo2tree.html</loc></url>
 </urlset>

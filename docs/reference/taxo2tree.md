@@ -58,16 +58,6 @@ Adrien Taudière
 ``` r
 # \donttest{
 library(MiscMetabar)
-#> Loading required package: ggplot2
-#> Loading required package: dplyr
-#> 
-#> Attaching package: ‘dplyr’
-#> The following objects are masked from ‘package:stats’:
-#> 
-#>     filter, lag
-#> The following objects are masked from ‘package:base’:
-#> 
-#>     intersect, setdiff, setequal, union
 data(data_fungi_mini)
 tree <- taxo2tree(data_fungi_mini,
   ranks = c("Domain", "Phylum", "Class", "Order", "Family", "Genus")

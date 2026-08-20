@@ -65,23 +65,37 @@ Rscript -e "devtools::check()"
 - Air format the package: `air format .` (then scope the diff — revert
   incidental reformats to unrelated files)
 
-## First migrations (priority order, from ROADMAP.md)
+## Shipped so far
 
-The current ROADMAP phylopq section is thin (only 2 items, one already
-flagged as a `tidypq` candidate). The section likely needs enrichment
-**before** the first feature batch — candidates to consider moving from
-`MiscMetabar` (line 121, epa-ng / BoSSA / gappa placement) and `tidypq`
-(line 161, phylo from taxonomy) once the home is settled.
+- [`taxo2tree()`](https://adrientaudiere.github.io/phylopq/reference/taxo2tree.md)
+  — build a `phylo` tree from a `tax_table()` (0.1.0, relocated from
+  `comparpq`).
+- [`add_tree_pq()`](https://adrientaudiere.github.io/phylopq/reference/add_tree_pq.md)
+  — attach a tree (`phylo`, Newick/Nexus file, or
+  [`taxo2tree()`](https://adrientaudiere.github.io/phylopq/reference/taxo2tree.md)
+  output) to a phyloseq object, reconciling tip labels and taxa names.
+- [`phylo_glom_pq()`](https://adrientaudiere.github.io/phylopq/reference/phylo_glom_pq.md)
+  /
+  [`phylo_glom_scan_pq()`](https://adrientaudiere.github.io/phylopq/reference/phylo_glom_scan_pq.md)
+  — agglomerate taxa below a cophenetic distance threshold.
+- [`delim_pq()`](https://adrientaudiere.github.io/phylopq/reference/delim_pq.md)
+  /
+  [`is_delim_installed()`](https://adrientaudiere.github.io/phylopq/reference/is_delim_installed.md)
+  — ABGD / ASAP species delimitation through `delimtools`.
 
-1.  `taxonomy_to_phylo()` (working name) — build a `phylo` tree from a
-    `tax_table()` — \[Medium/moderate\]. *Currently flagged as tidypq
-    candidate in ROADMAP.md line 297.*
-2.  ABGD / ASAP post-clustering wrapper — \[High/moderate\]. Prototype
-    in `arround_MiscMetabar/delimtools_trying.R` (not yet present on
-    disk).
+Demo: `arround_MiscMetabar/phylopq_demo.qmd`.
 
-See the R Feature Batch skill (`/r-feature-batch`) for the per-feature
-workflow.
+## Remaining ROADMAP items
+
+The phylopq section of `ROADMAP.md` is thin and holds no `easy` item.
+Enrich it before the next feature batch. What is left:
+
+1.  Phylogenetic placement via epa-ng / BoSSA / gappa — \[High/hard\].
+2.  Sequence similarity networks / NSC reclustering — \[Low/hard\].
+
+Note that the `(source:)` pointers of both are stale.
+
+See the `/pqverse-add-features` skill for the per-feature workflow.
 
 ## Cross-references
 

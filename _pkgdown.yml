@@ -16,6 +16,11 @@ reference:
       Functions for tree construction, phylogenetic distances and
       phylogeny-aware visualisations of 'phyloseq' objects.
     contents:
+      - add_tree_pq
+      - delim_pq
+      - is_delim_installed
+      - phylo_glom_pq
+      - phylo_glom_scan_pq
       - taxo2tree
 
 navbar:
