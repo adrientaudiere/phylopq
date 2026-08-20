@@ -17,10 +17,13 @@ reference:
       phylogeny-aware visualisations of 'phyloseq' objects.
     contents:
       - add_tree_pq
+      - align_pq
+      - delim_multi_pq
       - delim_pq
       - install_abgd
       - install_asap
       - is_delim_installed
+      - is_mafft_installed
       - phylo_glom_pq
       - phylo_glom_scan_pq
       - taxo2tree

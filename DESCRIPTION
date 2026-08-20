@@ -29,11 +29,18 @@ Suggests:
     Biostrings,
     DECIPHER,
     delimtools,
+    ggplot2,
+    ggtree,
+    ips,
     knitr,
+    patchwork,
     phangorn,
     rmarkdown,
     spelling,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble,
+    tidytree,
+    treeio
 biocViews: Sequencing, Microbiome, Metagenomics, Phylogenetics
 Remotes:
     adrientaudiere/MiscMetabar

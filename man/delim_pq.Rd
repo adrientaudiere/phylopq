@@ -13,6 +13,8 @@ delim_pq(
   webserver = NULL,
   outfolder = NULL,
   align = TRUE,
+  align_method = c("decipher", "mafft"),
+  mafft_exec = NULL,
   merge_taxa = TRUE,
   tax_adjust = 1L,
   rank_propagation = TRUE,
@@ -47,9 +49,17 @@ NULL.}
 output. Default to NULL, i.e. a temporary location.}
 
 \item{align}{Logical, if TRUE (default) reference sequences of unequal
-length are aligned with \code{\link[DECIPHER:AlignSeqs]{DECIPHER::AlignSeqs()}} before being submitted.
+length are aligned with \code{\link[=align_pq]{align_pq()}} before being submitted.
 Both ABGD and ASAP require an aligned FASTA and silently return nothing
 otherwise, so set \code{align = FALSE} only when \code{refseq} is already aligned.}
+
+\item{align_method}{Aligner used when \code{align = TRUE}, either \code{"decipher"}
+(default, pure R) or \code{"mafft"} (external program, much faster on large
+\code{refseq} slots). See \code{\link[=align_pq]{align_pq()}}.}
+
+\item{mafft_exec}{Path to the MAFFT executable. Only used when
+\code{align_method = "mafft"}. Default to NULL, i.e. the usual lookup of
+\code{\link[=is_mafft_installed]{is_mafft_installed()}}.}
 
 \item{merge_taxa}{Logical, if TRUE (default) taxa of the same partition are
 merged and a phyloseq object is returned. If FALSE, the partition table is
@@ -98,13 +108,14 @@ program does not return a partition for are dropped by
 
 Both programs need an aligned FASTA. Metabarcoding reference sequences are
 almost never aligned, hence the \code{align = TRUE} default; alignment of a
-large \code{refseq} slot can be slow.
+large \code{refseq} slot can be slow with the default \code{"decipher"} backend, in
+which case \code{align_method = "mafft"} is usually much faster.
 }
 \examples{
 \dontshow{if (phylopq::is_delim_installed("asap")) withAutoprint(\{ # examplesIf}
 library(MiscMetabar)
 data(data_fungi_mini)
-pq_asap <- delim_pq(data_fungi_mini, method = "asap", verbose = TRUE)
+pq_asap <- delim_pq(data_fungi_mini, method = "asap", verbose = TRUE, slope=0.5)
 phyloseq::ntaxa(pq_asap)
 
 \dontrun{
@@ -120,6 +131,9 @@ head(partitions)
 
 # Reuse a result file downloaded from the ASAP web server
 pq <- delim_pq(data_fungi_mini, method = "asap", webserver = "asap.csv")
+
+# Align with MAFFT instead of DECIPHER, much faster on large refseq slots
+pq <- delim_pq(data_fungi_mini, method = "asap", align_method = "mafft")
 }
 \dontshow{\}) # examplesIf}
 }
@@ -133,8 +147,8 @@ automatic partitioning. \emph{Molecular Ecology Resources} 21:609-620.
 \doi{10.1111/1755-0998.13281}
 }
 \seealso{
-\code{\link[=is_delim_installed]{is_delim_installed()}}, \code{\link[MiscMetabar:postcluster_pq]{MiscMetabar::postcluster_pq()}},
-\code{\link[MiscMetabar:merge_taxa_vec]{MiscMetabar::merge_taxa_vec()}}
+\code{\link[=delim_multi_pq]{delim_multi_pq()}}, \code{\link[=is_delim_installed]{is_delim_installed()}}, \code{\link[=align_pq]{align_pq()}},
+\code{\link[MiscMetabar:postcluster_pq]{MiscMetabar::postcluster_pq()}}, \code{\link[MiscMetabar:merge_taxa_vec]{MiscMetabar::merge_taxa_vec()}}
 }
 \author{
 Adrien Taudière

@@ -38,9 +38,15 @@
 #' @param outfolder Path to the folder where the external program writes its
 #'   output. Default to NULL, i.e. a temporary location.
 #' @param align Logical, if TRUE (default) reference sequences of unequal
-#'   length are aligned with [DECIPHER::AlignSeqs()] before being submitted.
+#'   length are aligned with [align_pq()] before being submitted.
 #'   Both ABGD and ASAP require an aligned FASTA and silently return nothing
 #'   otherwise, so set `align = FALSE` only when `refseq` is already aligned.
+#' @param align_method Aligner used when `align = TRUE`, either `"decipher"`
+#'   (default, pure R) or `"mafft"` (external program, much faster on large
+#'   `refseq` slots). See [align_pq()].
+#' @param mafft_exec Path to the MAFFT executable. Only used when
+#'   `align_method = "mafft"`. Default to NULL, i.e. the usual lookup of
+#'   [is_mafft_installed()].
 #' @param merge_taxa Logical, if TRUE (default) taxa of the same partition are
 #'   merged and a phyloseq object is returned. If FALSE, the partition table is
 #'   returned untouched.
@@ -63,7 +69,8 @@
 #'
 #'   Both programs need an aligned FASTA. Metabarcoding reference sequences are
 #'   almost never aligned, hence the `align = TRUE` default; alignment of a
-#'   large `refseq` slot can be slow.
+#'   large `refseq` slot can be slow with the default `"decipher"` backend, in
+#'   which case `align_method = "mafft"` is usually much faster.
 #'
 #' @author Adrien Taudière
 #'
@@ -76,8 +83,8 @@
 #' automatic partitioning. *Molecular Ecology Resources* 21:609-620.
 #' \doi{10.1111/1755-0998.13281}
 #'
-#' @seealso [is_delim_installed()], [MiscMetabar::postcluster_pq()],
-#'   [MiscMetabar::merge_taxa_vec()]
+#' @seealso [delim_multi_pq()], [is_delim_installed()], [align_pq()],
+#'   [MiscMetabar::postcluster_pq()], [MiscMetabar::merge_taxa_vec()]
 #'
 #' @examplesIf phylopq::is_delim_installed("asap")
 #' library(MiscMetabar)
@@ -98,6 +105,9 @@
 #'
 #' # Reuse a result file downloaded from the ASAP web server
 #' pq <- delim_pq(data_fungi_mini, method = "asap", webserver = "asap.csv")
+#'
+#' # Align with MAFFT instead of DECIPHER, much faster on large refseq slots
+#' pq <- delim_pq(data_fungi_mini, method = "asap", align_method = "mafft")
 #' }
 #' @importFrom MiscMetabar verify_pq merge_taxa_vec
 #' @export
@@ -110,6 +120,8 @@ delim_pq <- function(
   webserver = NULL,
   outfolder = NULL,
   align = TRUE,
+  align_method = c("decipher", "mafft"),
+  mafft_exec = NULL,
   merge_taxa = TRUE,
   tax_adjust = 1L,
   rank_propagation = TRUE,
@@ -118,6 +130,7 @@ delim_pq <- function(
 ) {
   verify_pq(physeq)
   method <- match.arg(method)
+  align_method <- match.arg(align_method)
 
   if (!requireNamespace("delimtools", quietly = TRUE)) {
     cli::cli_abort(
@@ -140,7 +153,12 @@ delim_pq <- function(
     exe <- resolve_delim_exe(method, exe)
   }
 
-  dna <- align_refseq(Biostrings::DNAStringSet(physeq@refseq), align)
+  dna <- align_refseq(
+    Biostrings::DNAStringSet(physeq@refseq),
+    align,
+    align_method,
+    mafft_exec
+  )
 
   fasta_file <- file.path(tempdir(), paste0("delim_pq_", method, ".fasta"))
   Biostrings::writeXStringSet(dna, fasta_file)
@@ -288,7 +306,12 @@ is_delim_installed <- function(method = c("asap", "abgd"), path = NULL) {
 #' @return An aligned `DNAStringSet`.
 #' @noRd
 #' @keywords internal
-align_refseq <- function(dna, align) {
+align_refseq <- function(
+  dna,
+  align,
+  align_method = "decipher",
+  mafft_exec = NULL
+) {
   if (length(unique(Biostrings::width(dna))) == 1) {
     return(dna)
   }
@@ -299,12 +322,7 @@ align_refseq <- function(dna, align) {
       "i" = "Use {.code align = TRUE} to align them first."
     ))
   }
-  if (!requireNamespace("DECIPHER", quietly = TRUE)) {
-    cli::cli_abort(
-      "Package {.pkg DECIPHER} is required to align the {.field refseq} slot."
-    )
-  }
-  DECIPHER::AlignSeqs(dna, anchor = NA, verbose = FALSE)
+  align_pq(dna, method = align_method, exec = mafft_exec)
 }
 
 #' Find the executable required by [delim_pq()]

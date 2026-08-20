@@ -83,18 +83,38 @@ Rscript -e "devtools::check()"
   whose `wrapio.h` Python shim is neutralised in a throwaway copy
   before `make`); `src` takes a URL, archive or directory for a manual
   install.
+- `align_pq()` / `is_mafft_installed()` — build an alignment from the
+  `refseq` slot with DECIPHER (pure R) or MAFFT (`ips::mafft()`).
+  Returns a `DNAStringSet`, never a phyloseq object: an alignment is a
+  valid `refseq` (gaps are DNA letters) but the rest of the pqverse
+  consumes those sequences as unaligned. Reachable from `delim_pq()`
+  and `delim_multi_pq()` through `align_method`.
+- `delim_multi_pq()` — scan ABGD across `slopes`, add one ASAP run, join
+  the partitions and draw them along a tree with
+  `delimtools::delim_autoplot()`. Two upstream quirks are worked around:
+  `delim_join()` strips every digit from delimitation names (so runs are
+  submitted under digit-free aliases and renamed afterwards), and
+  `delim_autoplot()` reads `posterior` / `support` node columns that a
+  plain `phylo` lacks (so the tree is converted to `treedata` with both
+  columns filled).
 
 Demo: `arround_MiscMetabar/phylopq_demo.qmd`.
 
 ## Remaining ROADMAP items
 
-The phylopq section of `ROADMAP.md` is thin and holds no `easy` item.
-Enrich it before the next feature batch. What is left:
+The two `critical` items are shipped. The phylopq section of
+`ROADMAP.md` is thin — enrich it before the next feature batch. What is
+left:
 
-1. Phylogenetic placement via epa-ng / BoSSA / gappa — [High/hard].
-2. Sequence similarity networks / NSC reclustering — [Low/hard].
+1. Route the remaining `DECIPHER::AlignSeqs()` call sites of the pqverse
+   through `align_pq()` — [High/easy]. Blocked on the golden rule:
+   `MiscMetabar::build_phytree_pq()` cannot depend on phylopq, so either
+   duplicate the mafft helper there or move `align_pq()` down into
+   MiscMetabar. `taxinfo::intra_taxnames_dist()` has no such constraint.
+2. Phylogenetic placement via epa-ng / BoSSA / gappa — [High/hard].
+3. Sequence similarity networks / NSC reclustering — [Low/hard].
 
-Note that the `(source:)` pointers of both are stale.
+Note that the `(source:)` pointers of 2 and 3 are stale.
 
 See the `/pqverse-add-features` skill for the per-feature workflow.
 
