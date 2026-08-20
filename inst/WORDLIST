@@ -27,8 +27,10 @@ cophenetic
 delimtools
 et
 ggplot
+iTaxoTools
 ladderized
 ladderizing
+neutralises
 outgroup
 patristic
 phangorn
@@ -40,4 +42,5 @@ pqverse
 refseq
 scaffolded
 taxa
+toolchain
 visualisations

@@ -2,6 +2,8 @@
 
 export(add_tree_pq)
 export(delim_pq)
+export(install_abgd)
+export(install_asap)
 export(is_delim_installed)
 export(phylo_glom_pq)
 export(phylo_glom_scan_pq)

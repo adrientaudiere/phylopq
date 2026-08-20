@@ -18,6 +18,8 @@ reference:
     contents:
       - add_tree_pq
       - delim_pq
+      - install_abgd
+      - install_asap
       - is_delim_installed
       - phylo_glom_pq
       - phylo_glom_scan_pq

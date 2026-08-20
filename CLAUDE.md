@@ -75,6 +75,14 @@ Rscript -e "devtools::check()"
   cophenetic distance threshold.
 - `delim_pq()` / `is_delim_installed()` — ABGD / ASAP species
   delimitation through `delimtools`.
+- `install_asap()` / `install_abgd()` — build the external ABGD / ASAP
+  executables into `tools::R_user_dir("phylopq", "data")/bin`, where
+  `is_delim_installed()` now looks (option → user data dir → `PATH`).
+  Upstream `bioinfo.mnhn.fr` is down, so sources come from the
+  Internet Archive (ABGD, pristine) and the iTaxoTools mirrors (ASAP,
+  whose `wrapio.h` Python shim is neutralised in a throwaway copy
+  before `make`); `src` takes a URL, archive or directory for a manual
+  install.
 
 Demo: `arround_MiscMetabar/phylopq_demo.qmd`.
 

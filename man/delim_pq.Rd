@@ -27,8 +27,10 @@ with a non-empty \code{refseq} slot.}
 \item{method}{One of \code{"asap"} (default) or \code{"abgd"}.}
 
 \item{exe}{Path to the ABGD or ASAP executable. Ignored when \code{webserver} is
-given. Default to NULL, in which case the executable is looked up on the
-\code{PATH} with \code{\link[=is_delim_installed]{is_delim_installed()}}.}
+given. Default to NULL, in which case the executable is looked up with
+\code{\link[=is_delim_installed]{is_delim_installed()}}: first the \code{phylopq.asappath} / \code{phylopq.abgdpath}
+option, then a copy installed by \code{\link[=install_asap]{install_asap()}} / \code{\link[=install_abgd]{install_abgd()}},
+then the system \code{PATH}.}
 
 \item{model}{Integer, the evolutionary model used by the external program.
 0: Kimura-2P, 1: Jukes-Cantor, 2: Tamura-Nei, 3: simple p-distance

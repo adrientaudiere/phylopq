@@ -23,8 +23,10 @@
 #'   with a non-empty `refseq` slot.
 #' @param method One of `"asap"` (default) or `"abgd"`.
 #' @param exe Path to the ABGD or ASAP executable. Ignored when `webserver` is
-#'   given. Default to NULL, in which case the executable is looked up on the
-#'   `PATH` with [is_delim_installed()].
+#'   given. Default to NULL, in which case the executable is looked up with
+#'   [is_delim_installed()]: first the `phylopq.asappath` / `phylopq.abgdpath`
+#'   option, then a copy installed by [install_asap()] / [install_abgd()],
+#'   then the system `PATH`.
 #' @param model Integer, the evolutionary model used by the external program.
 #'   0: Kimura-2P, 1: Jukes-Cantor, 2: Tamura-Nei, 3: simple p-distance
 #'   (default).
@@ -80,7 +82,7 @@
 #' @examplesIf phylopq::is_delim_installed("asap")
 #' library(MiscMetabar)
 #' data(data_fungi_mini)
-#' pq_asap <- delim_pq(data_fungi_mini, method = "asap", verbose = TRUE)
+#' pq_asap <- delim_pq(data_fungi_mini, method = "asap", verbose = TRUE, slope=0.5)
 #' phyloseq::ntaxa(pq_asap)
 #'
 #' \dontrun{
@@ -146,6 +148,18 @@ delim_pq <- function(
     on.exit(unlink(fasta_file), add = TRUE)
   }
 
+  # Both programs write their partitions next to each other and both readers
+  # pick a file up by name. Sharing one directory between runs means a run that
+  # outputs nothing silently inherits the previous run's partitions, so give
+  # each run its own folder unless the caller chose one.
+  if (is.null(outfolder)) {
+    outfolder <- tempfile("phylopq_delim_")
+    dir.create(outfolder, recursive = TRUE, showWarnings = FALSE)
+    if (!keep_temporary_files) {
+      on.exit(unlink(outfolder, recursive = TRUE), add = TRUE)
+    }
+  }
+
   res <- if (method == "abgd") {
     delimtools::abgd_tbl(
       infile = fasta_file,
@@ -157,13 +171,14 @@ delim_pq <- function(
       delimname = "abgd"
     )
   } else {
-    delimtools::asap_tbl(
+    asap_tbl_safely(
       infile = fasta_file,
       exe = exe,
       model = model,
       outfolder = outfolder,
       webserver = webserver,
-      delimname = "asap"
+      delimname = "asap",
+      verbose = verbose
     )
   }
 
@@ -178,6 +193,27 @@ delim_pq <- function(
 
   if (!merge_taxa) {
     return(partitions)
+  }
+
+  # A single partition means no barcode gap was found. Merging would collapse
+  # every taxon into one, which `merge_taxa_vec()` cannot do; report the real
+  # cause rather than letting it fail on a missing column.
+  n_partitions <- length(unique(stats::na.omit(partitions$partition)))
+  if (n_partitions <= 1 && phyloseq::ntaxa(physeq) > 1) {
+    cli::cli_abort(c(
+      "{.field {method}} placed all {phyloseq::ntaxa(physeq)} taxa in a
+       single partition.",
+      "i" = "No barcode gap was found, so there is nothing to merge.",
+      if (method == "abgd") {
+        c("i" = "Rerun with a lower {.arg slope} (currently {slope}).")
+      } else {
+        c(
+          "i" = "Try another {.arg model}, or run the analysis on a
+                 more variable marker."
+        )
+      },
+      "i" = "Use {.code merge_taxa = FALSE} to inspect the partition table."
+    ))
   }
 
   groups <- partitions$partition
@@ -213,12 +249,14 @@ delim_pq <- function(
 #' <a href="https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle"> <img src="https://img.shields.io/badge/lifecycle-experimental-orange" alt="lifecycle-experimental"></a>
 #'
 #' Check whether the external program needed by [delim_pq()] is
-#' installed, either at an explicit path or on the `PATH`. Useful to guard
-#' examples, tests and vignette chunks.
+#' installed, either at an explicit path or through the usual lookup. Useful to
+#' guard examples, tests and vignette chunks.
 #'
 #' @param method One of `"asap"` (default) or `"abgd"`.
 #' @param path Optional path to the executable. Default to NULL, in which case
-#'   `method` is looked up on the `PATH` with [base::Sys.which()].
+#'   `method` is looked up in three places, in order: the `phylopq.asappath` /
+#'   `phylopq.abgdpath` option, a copy installed by [install_asap()] /
+#'   [install_abgd()], then the system `PATH`.
 #'
 #' @return A logical of length one. FALSE when the `delimtools` package is not
 #'   installed, so that the check also guards the R-level dependency.
@@ -239,7 +277,8 @@ is_delim_installed <- function(method = c("asap", "abgd"), path = NULL) {
   if (!is.null(path)) {
     return(file.exists(path))
   }
-  nzchar(Sys.which(method))
+  exe <- find_delim_exe(method)
+  nzchar(exe) && file.exists(exe)
 }
 
 #' Align reference sequences before a delimitation run
@@ -276,11 +315,13 @@ align_refseq <- function(dna, align) {
 #' @keywords internal
 resolve_delim_exe <- function(method, exe) {
   if (is.null(exe)) {
-    exe <- unname(Sys.which(method))
+    exe <- find_delim_exe(method)
   }
   if (!nzchar(exe) || !file.exists(exe)) {
     cli::cli_abort(c(
       "The {.field {method}} executable was not found.",
+      "i" = "Install it with {.code phylopq::install_asap()} or
+             {.code phylopq::install_abgd()}.",
       "i" = "Give its path with {.arg exe}, or a web-server result file with
              {.arg webserver}.",
       "i" = "Installation instructions:
@@ -288,6 +329,115 @@ resolve_delim_exe <- function(method, exe) {
     ))
   }
   exe
+}
+
+#' Run ASAP and read the partition file it actually wrote
+#'
+#' `delimtools::asap_tbl()` cannot drive current ASAP builds, for two reasons:
+#'
+#' * it looks for `{outfolder}/{basename(infile)}.Partition_1.csv`, but ASAP
+#'   derives that prefix itself and may shorten it depending on the input, so
+#'   the file is missed. `asap_tbl()` then *silently* falls back to a table
+#'   placing every sequence in one partition, which would merge all taxa into
+#'   a single species without any warning;
+#' * it finishes by tidying two "rogue" files that older ASAP builds dropped in
+#'   the working directory, resolving them with [tools::file_path_as_absolute()]
+#'   — which errors when they are absent — before testing `file.exists()`.
+#'   Current ASAP writes everything to its `-o` folder, so a successful run
+#'   aborts with `file '<name>.res.cvs' does not exist`.
+#'
+#' So the external program is invoked here, from a scratch working directory,
+#' and the partition file is located by pattern rather than by guessed name.
+#' Parsing is still delegated to `asap_tbl()` through its `webserver` argument,
+#' which returns early and therefore avoids both problems. A web-server result
+#' supplied by the user is passed straight through.
+#'
+#' @inheritParams delim_pq
+#' @param infile Path to the FASTA file passed to ASAP.
+#' @param delimname Name given to the delimitation column.
+#' @return A `tbl_df` with columns `labels` and `delimname`.
+#' @noRd
+#' @keywords internal
+asap_tbl_safely <- function(
+  infile,
+  exe,
+  model,
+  outfolder,
+  webserver,
+  delimname,
+  verbose = FALSE
+) {
+  # A web-server result needs no local run.
+  if (!is.null(webserver)) {
+    return(delimtools::asap_tbl(
+      infile = infile,
+      exe = exe,
+      model = model,
+      outfolder = outfolder,
+      webserver = webserver,
+      delimname = delimname
+    ))
+  }
+
+  # Resolve while the original working directory is still current.
+  infile <- normalizePath(infile, mustWork = TRUE)
+  if (is.null(outfolder)) {
+    outfolder <- tempdir()
+  }
+  outfolder <- normalizePath(outfolder, mustWork = TRUE)
+
+  scratch <- file.path(tempdir(), "phylopq_asap_cwd")
+  dir.create(scratch, recursive = TRUE, showWarnings = FALSE)
+  old_wd <- setwd(scratch)
+  on.exit(setwd(old_wd), add = TRUE)
+
+  asap_log <- suppressWarnings(system2(
+    exe,
+    args = c(
+      "-d",
+      model,
+      "-a",
+      "-o",
+      shQuote(outfolder),
+      shQuote(infile)
+    ),
+    stdout = TRUE,
+    stderr = TRUE
+  ))
+  if (verbose) {
+    cli::cli_verbatim(asap_log)
+  }
+  status <- attr(asap_log, "status")
+  if (!is.null(status) && status != 0) {
+    cli::cli_abort(c(
+      "{.field asap} failed with status {status}.",
+      "x" = paste(utils::tail(asap_log, 10), collapse = "\n")
+    ))
+  }
+
+  # ASAP names its output from a prefix it derives itself, so match the
+  # pattern and take the most recent hit rather than trusting a built name.
+  hits <- list.files(
+    outfolder,
+    pattern = "\\.Partition_1\\.csv$",
+    full.names = TRUE
+  )
+  if (length(hits) == 0) {
+    cli::cli_abort(c(
+      "{.field asap} produced no partition file in {.path {outfolder}}.",
+      "x" = paste(utils::tail(asap_log, 10), collapse = "\n")
+    ))
+  }
+  partition <- hits[order(file.mtime(hits), decreasing = TRUE)][[1]]
+
+  res <- delimtools::asap_tbl(
+    infile = infile,
+    webserver = partition,
+    delimname = delimname
+  )
+  # The webserver branch reads every column as character.
+  res[[delimname]] <- as.integer(res[[delimname]])
+  res
 }
 
 #' Map a delimtools partition table onto the taxa of a phyloseq object

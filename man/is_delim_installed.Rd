@@ -10,7 +10,9 @@ is_delim_installed(method = c("asap", "abgd"), path = NULL)
 \item{method}{One of \code{"asap"} (default) or \code{"abgd"}.}
 
 \item{path}{Optional path to the executable. Default to NULL, in which case
-\code{method} is looked up on the \code{PATH} with \code{\link[base:Sys.which]{base::Sys.which()}}.}
+\code{method} is looked up in three places, in order: the \code{phylopq.asappath} /
+\code{phylopq.abgdpath} option, a copy installed by \code{\link[=install_asap]{install_asap()}} /
+\code{\link[=install_abgd]{install_abgd()}}, then the system \code{PATH}.}
 }
 \value{
 A logical of length one. FALSE when the \code{delimtools} package is not
@@ -20,8 +22,8 @@ installed, so that the check also guards the R-level dependency.
 \if{html}{\out{<a href="https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle">}} \if{html}{\out{<img src="https://img.shields.io/badge/lifecycle-experimental-orange" alt="lifecycle-experimental">}}\if{html}{\out{</a>}}
 
 Check whether the external program needed by \code{\link[=delim_pq]{delim_pq()}} is
-installed, either at an explicit path or on the \code{PATH}. Useful to guard
-examples, tests and vignette chunks.
+installed, either at an explicit path or through the usual lookup. Useful to
+guard examples, tests and vignette chunks.
 }
 \examples{
 is_delim_installed("asap")

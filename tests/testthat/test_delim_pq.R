@@ -91,3 +91,41 @@ test_that("align_refseq aligns unequal sequences", {
   expect_length(unique(Biostrings::width(aln)), 1)
   expect_equal(names(aln), names(dna))
 })
+
+test_that("delim_pq delimits and merges taxa with asap", {
+  skip_if_not(is_delim_installed("asap"))
+  res <- delim_pq(data_fungi_mini, method = "asap")
+  expect_s4_class(res, "phyloseq")
+  expect_lt(phyloseq::ntaxa(res), phyloseq::ntaxa(data_fungi_mini))
+  expect_gt(phyloseq::ntaxa(res), 1)
+})
+
+test_that("delim_pq returns a partition table when merge_taxa is FALSE", {
+  skip_if_not(is_delim_installed("asap"))
+  res <- delim_pq(data_fungi_mini, method = "asap", merge_taxa = FALSE)
+  expect_named(res, c("taxa", "partition"))
+  expect_identical(res$taxa, phyloseq::taxa_names(data_fungi_mini))
+  expect_gt(length(unique(res$partition)), 1)
+})
+
+test_that("delim_pq is reproducible across consecutive runs", {
+  skip_if_not(is_delim_installed("asap"))
+  first <- delim_pq(data_fungi_mini, method = "asap", merge_taxa = FALSE)
+  second <- delim_pq(data_fungi_mini, method = "asap", merge_taxa = FALSE)
+  expect_identical(first, second)
+})
+
+test_that("delim_pq reports a single-partition result instead of merging", {
+  skip_if_not(is_delim_installed("abgd"))
+  expect_error(
+    delim_pq(data_fungi_mini, method = "abgd", slope = 1.5),
+    "single partition"
+  )
+})
+
+test_that("delim_pq delimits with abgd given a workable slope", {
+  skip_if_not(is_delim_installed("abgd"))
+  res <- delim_pq(data_fungi_mini, method = "abgd", slope = 0.5)
+  expect_s4_class(res, "phyloseq")
+  expect_lt(phyloseq::ntaxa(res), phyloseq::ntaxa(data_fungi_mini))
+})
