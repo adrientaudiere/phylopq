@@ -1,5 +1,5 @@
 library(MiscMetabar)
-data(data_fungi_mini)
+
 
 tree_mini <- taxo2tree(data_fungi_mini)
 

@@ -1,5 +1,5 @@
 library(MiscMetabar)
-data(data_fungi_mini)
+
 
 test_that("is_delim_installed returns a single logical", {
   expect_length(is_delim_installed("asap"), 1)

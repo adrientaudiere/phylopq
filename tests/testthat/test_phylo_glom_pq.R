@@ -1,5 +1,5 @@
 library(MiscMetabar)
-data(data_fungi_mini)
+
 
 pq_tree <- add_tree_pq(
   data_fungi_mini,

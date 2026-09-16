@@ -1,7 +1,7 @@
 skip_on_cran()
 
 library(MiscMetabar)
-data(data_fungi_mini)
+
 
 df <- suppressMessages(subset_taxa_pq(
   data_fungi_mini,

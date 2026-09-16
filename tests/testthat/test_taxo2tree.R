@@ -1,5 +1,5 @@
 library(MiscMetabar)
-data(data_fungi_mini)
+
 
 ranks6 <- c("Domain", "Phylum", "Class", "Order", "Family", "Genus")
 

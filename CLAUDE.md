@@ -83,12 +83,15 @@ Rscript -e "devtools::check()"
   whose `wrapio.h` Python shim is neutralised in a throwaway copy
   before `make`); `src` takes a URL, archive or directory for a manual
   install.
-- `align_pq()` / `is_mafft_installed()` — build an alignment from the
-  `refseq` slot with DECIPHER (pure R) or MAFFT (`ips::mafft()`).
-  Returns a `DNAStringSet`, never a phyloseq object: an alignment is a
-  valid `refseq` (gaps are DNA letters) but the rest of the pqverse
-  consumes those sequences as unaligned. Reachable from `delim_pq()`
-  and `delim_multi_pq()` through `align_method`.
+- `align_pq()` / `is_mafft_installed()` — **moved to MiscMetabar** and
+  re-exported here (`R/align_pq.R` is now a re-export shim). MiscMetabar
+  cannot depend on phylopq (golden rule) but everything depends on
+  MiscMetabar, so this is what makes the MAFFT backend reachable from
+  `MiscMetabar::build_phytree_pq()` and `taxinfo::intra_taxnames_dist()`,
+  which both gained `align_method`. The option is now
+  `MiscMetabar.mafftpath`, not `phylopq.mafftpath`. Both call sites pass
+  `force = TRUE` so an equal-width `refseq` is still aligned, as it was
+  when they called DECIPHER directly.
 - `delim_multi_pq()` — scan ABGD across `slopes`, add one ASAP run, join
   the partitions and draw them along a tree with
   `delimtools::delim_autoplot()`. Two upstream quirks are worked around:
@@ -98,25 +101,81 @@ Rscript -e "devtools::check()"
   plain `phylo` lacks (so the tree is converted to `treedata` with both
   columns filled).
 
-Demo: `arround_MiscMetabar/phylopq_demo.qmd`.
+- `ssn_glom_pq()` / `ssn_glom_scan_pq()` — network sequence clusters
+  (NSC) from a `vsearch --allpairs_global` sequence-similarity network
+  (Forster et al. 2019). Connected components are *single-linkage*, so a
+  cluster can be far wider than `id`; the scan runs vsearch once at the
+  lowest threshold and filters the identities at each of the others.
+  `--strand` is **not** a valid `--allpairs_global` option;
+  `--notrunclabels` is passed so taxa names survive the FASTA header.
+- `ref_package_pq()` — assembles the reference alignment + tree that
+  `place_pq()` needs. **The scientific point** (from the developer): the
+  reference is normally *external* to the phyloseq object, and the two
+  halves answer to different constraints — the alignment must be the
+  same marker the primers amplify, whereas the tree is fixed and never
+  re-estimated, so it should carry evidence the barcode cannot (multi-
+  locus, morphology/ecology, integrative-taxonomy topologies). Three
+  workflows are supported: fully external; external sequences with the
+  tree inferred here (`tree_method`, weakest); mixed, where a few sure
+  taxa of the dataset join the reference via `physeq`/`ref_taxa` and are
+  then kept out of the queries with `place_pq(exclude_taxa = )`.
+  Reconciliation is explicit: `drop_tips` yes by default, `drop_seqs`
+  **no** by default (a sequence missing from the tree is a labelling
+  bug, not something to discard), and an unrelated label set is named.
+- `place_pq()` / `assign_placement_pq()` — EPA-ng placement on a fixed
+  reference tree, then `gappa examine assign` for the taxonomy. Takes
+  either `refpkg` or `ref_alignment` + `ref_tree`, and `query_taxa` /
+  `exclude_taxa` choose what gets placed. Queries
+  are aligned into the reference alignment with
+  `mafft --add --keeplength` (invoked directly: `ips::mafft()` offers no
+  `--add`), and the `.jplace` is read with `BoSSA::read_jplace()`, which
+  renumbers branches — hence both `edge` and `jplace_edge` in the result.
+  `cmd_is_run = FALSE` builds the commands without the programs
+  installed and without requiring the reference files to exist.
+  Two gappa facts verified against v0.9.0: `per_query.tsv` is written
+  **only** with `--per-query-results` (always passed; the default
+  `profile.tsv` aggregates over the sample and has no query names), and
+  it holds **one row per query per taxonomic depth** with `LWR`/`aLWR`
+  columns — so the assignment is the deepest row clearing `min_alwr`
+  (default 0.5), not the single row a naive reader would expect.
+  Verified end-to-end against epa-ng v0.3.8 + gappa v0.9.0 with a
+  leave-out reference package built from `data_fungi_mini` (see
+  `test_place_pq.R`): 3 of 4 left-out queries were recovered exactly to
+  genus, the fourth correctly to order.
+- `install_epang()` / `install_gappa()` — recursive `git clone` + cmake,
+  because both carry their libraries as submodules that a release
+  tarball lacks. Unlike ABGD/ASAP these cannot come from an archive.
+  **`install_epang()` additionally needs `bison` and `flex`**: epa-ng
+  bundles `pll-modules` → `libpll`, whose CMake calls `BISON_TARGET()`,
+  and without them the build dies at *configure* time with
+  `Unknown CMake command "BISON_TARGET"` — several minutes into the
+  clone, hence the up-front check in `check_place_build_tools()`. gappa
+  builds on `genesis` alone and needs neither.
+
+Demos: `arround_MiscMetabar/phylopq_demo.qmd` (0.2.0 features) and
+`arround_MiscMetabar/phylopq_placement_demo.qmd` (NSC + placement).
 
 ## Remaining ROADMAP items
 
-The two `critical` items are shipped. The phylopq section of
-`ROADMAP.md` is thin — enrich it before the next feature batch. What is
-left:
+All three items that stood in the phylopq section of `ROADMAP.md` have
+shipped. The section was refilled with three new ones, none of them
+critical:
 
-1. Route the remaining `DECIPHER::AlignSeqs()` call sites of the pqverse
-   through `align_pq()` — [High/easy]. Blocked on the golden rule:
-   `MiscMetabar::build_phytree_pq()` cannot depend on phylopq, so either
-   duplicate the mafft helper there or move `align_pq()` down into
-   MiscMetabar. `taxinfo::intra_taxnames_dist()` has no such constraint.
-2. Phylogenetic placement via epa-ng / BoSSA / gappa — [High/hard].
-3. Sequence similarity networks / NSC reclustering — [Low/hard].
-
-Note that the `(source:)` pointers of 2 and 3 are stale.
-
-See the `/pqverse-add-features` skill for the per-feature workflow.
+0. **Vignette on the three `ref_package_pq()` workflows** —
+   [High/moderate], and the one with a written plan already:
+   `roadmap/place_pq_vignette.md` at the workspace root. Blocked on
+   sourcing a real reference package (clade, published multi-locus tree,
+   licensing); candidate clades and the sourcing gate are in that file.
+   Every current example uses a synthetic or leave-out reference, which
+   is exactly what the vignette must not do.
+1. Phylogenetic diversity metrics (Faith's PD, MPD, MNTD, UniFrac) —
+   [Medium/moderate]. `DESCRIPTION` advertises them and nothing in the
+   pqverse provides them yet.
+2. Phylogeny-aware visualisation, a `plot_tree_pq()` on `ggtree` —
+   [Medium/moderate].
+3. Placement follow-ups: `plot_placement_pq()` over BoSSA's plotting, and
+   a `BoSSA::refpkg()` reader so one `.refpkg` argument replaces
+   `ref_alignment` + `ref_tree` + `model` — [Low/moderate].
 
 ## Cross-references
 
