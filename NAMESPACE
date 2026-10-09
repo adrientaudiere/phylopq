@@ -21,14 +21,20 @@ export(ref_package_pq)
 export(ssn_glom_pq)
 export(ssn_glom_scan_pq)
 export(taxo2tree)
-importFrom(MiscMetabar,align_pq)
-importFrom(MiscMetabar,is_mafft_installed)
-importFrom(MiscMetabar,merge_taxa_vec)
-importFrom(MiscMetabar,verify_pq)
-importFrom(ape,read.tree)
-importFrom(ape,write.tree)
-importFrom(cli,cli_abort)
-importFrom(cli,cli_warn)
+importFrom(MiscMetabar,
+  align_pq,
+  is_mafft_installed,
+  merge_taxa_vec,
+  verify_pq
+)
+importFrom(ape,
+  read.tree,
+  write.tree
+)
+importFrom(cli,
+  cli_abort,
+  cli_warn
+)
 importFrom(lifecycle,deprecated)
 importFrom(methods,is)
 importFrom(phyloseq,phy_tree)
