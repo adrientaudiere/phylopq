@@ -1,5 +1,7 @@
 # Agglomerate taxa closer than a cophenetic distance threshold
 
+[![lifecycle-experimental](https://img.shields.io/badge/lifecycle-experimental-orange)](https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle)
+
 Merge taxa (ASV, OTU, ...) whose patristic (cophenetic) distance on the
 `phy_tree` of a
 [`phyloseq-class`](https://rdrr.io/pkg/phyloseq/man/phyloseq-class.html)
@@ -80,10 +82,6 @@ A
 object with agglomerated taxa, or a data.frame with columns `taxa` and
 `cluster` when `return_map = TRUE`.
 
-## Details
-
-[![lifecycle-experimental](https://img.shields.io/badge/lifecycle-experimental-orange)](https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle)
-
 ## See also
 
 [`phylo_glom_scan_pq()`](https://adrientaudiere.github.io/phylopq/reference/phylo_glom_scan_pq.md),
@@ -102,17 +100,49 @@ Adrien Taudière
 library(MiscMetabar)
 data(data_fungi_mini)
 
-pq <- add_tree_pq(data_fungi_mini, compute_brlen = TRUE)
+pq <- add_tree_pq(
+  data_fungi_mini,
+  use_taxo_to_build_tree = TRUE,
+  compute_brlen = TRUE
+)
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
 phyloseq::ntaxa(pq)
 #> [1] 45
 
 pq_glom <- phylo_glom_pq(pq, h = 0.2, verbose = TRUE)
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
 #> ✔ 45 taxa agglomerated into 26 taxa at h = 0.2.
 phyloseq::ntaxa(pq_glom)
 #> [1] 26
 
 # Inspect the taxa-to-cluster mapping without merging
 map <- phylo_glom_pq(pq, h = 0.2, return_map = TRUE)
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
 head(map)
 #>    taxa cluster
 #> 1  ASV7       1

@@ -1,5 +1,7 @@
 # Scan several cophenetic thresholds before agglomerating
 
+[![lifecycle-experimental](https://img.shields.io/badge/lifecycle-experimental-orange)](https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle)
+
 Compute the number of taxa that
 [`phylo_glom_pq()`](https://adrientaudiere.github.io/phylopq/reference/phylo_glom_pq.md)
 would return for a range of cophenetic thresholds, without building the
@@ -38,10 +40,6 @@ A data.frame with one row per value of `h_values` and the columns `h`
 (the threshold), `n_taxa` (the resulting number of taxa) and `prop_taxa`
 (that number divided by the initial number of taxa).
 
-## Details
-
-[![lifecycle-experimental](https://img.shields.io/badge/lifecycle-experimental-orange)](https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle)
-
 ## See also
 
 [`phylo_glom_pq()`](https://adrientaudiere.github.io/phylopq/reference/phylo_glom_pq.md)
@@ -57,8 +55,22 @@ Adrien Taudière
 library(MiscMetabar)
 data(data_fungi_mini)
 
-pq <- add_tree_pq(data_fungi_mini, compute_brlen = TRUE)
+pq <- add_tree_pq(
+  data_fungi_mini,
+  use_taxo_to_build_tree = TRUE,
+  compute_brlen = TRUE
+)
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
 phylo_glom_scan_pq(pq, h_values = seq(0, 1, by = 0.1))
+#> Found more than one class "phylo" in cache; using the first, from namespace 'phyloseq'
+#> Also defined by ‘tidytree’
 #>      h n_taxa prop_taxa
 #> 1  0.0     45 1.0000000
 #> 2  0.1     36 0.8000000

@@ -29,9 +29,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="phylogenetic-analysis-for-phyloseq">Phylogenetic analysis for phyloseq<a class="anchor" aria-label="anchor" href="#phylogenetic-analysis-for-phyloseq"></a></h2>
+      <h2 id="trees">Trees<a class="anchor" aria-label="anchor" href="#trees"></a></h2>
 
-      <div class="section-desc"><p>Functions for tree construction, phylogenetic distances and phylogeny-aware visualisations of ‘phyloseq’ objects.</p></div>
+      <div class="section-desc"><p>Build a tree from the taxonomy, attach it to a ‘phyloseq’ object and agglomerate taxa along it.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -44,20 +44,6 @@
 
         </dt>
         <dd>Attach, repair and prune a phylogenetic tree onto a phyloseq object</dd>
-
-        <dt>
-
-          <code><a href="delim_pq.html">delim_pq()</a></code>
-
-        </dt>
-        <dd>Species delimitation of a phyloseq object with ABGD or ASAP</dd>
-
-        <dt>
-
-          <code><a href="is_delim_installed.html">is_delim_installed()</a></code>
-
-        </dt>
-        <dd>Is an ABGD or ASAP executable available?</dd>
 
         <dt>
 
@@ -79,8 +65,157 @@
 
         </dt>
         <dd>Convert taxonomy dataframe to phylogenetic tree</dd>
+      </dl></div><div class="section level2">
+      <h2 id="species-delimitation-and-clustering">Species delimitation and clustering<a class="anchor" aria-label="anchor" href="#species-delimitation-and-clustering"></a></h2>
+
+      <div class="section-desc"><p>Regroup taxa by a barcode gap (ABGD, ASAP) or by a sequence-similarity network (NSC).</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="delim_multi_pq.html">delim_multi_pq()</a></code>
+
+        </dt>
+        <dd>Compare several species delimitations of a phyloseq object</dd>
+
+        <dt>
+
+          <code><a href="delim_pq.html">delim_pq()</a></code>
+
+        </dt>
+        <dd>Species delimitation of a phyloseq object with ABGD or ASAP</dd>
+
+        <dt>
+
+          <code><a href="ssn_glom_pq.html">ssn_glom_pq()</a></code>
+
+        </dt>
+        <dd>Agglomerate taxa into network sequence clusters (NSC)</dd>
+
+        <dt>
+
+          <code><a href="ssn_glom_scan_pq.html">ssn_glom_scan_pq()</a></code>
+
+        </dt>
+        <dd>Scan several similarity thresholds before agglomerating</dd>
+      </dl></div><div class="section level2">
+      <h2 id="phylogenetic-placement">Phylogenetic placement<a class="anchor" aria-label="anchor" href="#phylogenetic-placement"></a></h2>
+
+      <div class="section-desc"><p>Place reference sequences on a fixed reference phylogeny with EPA-ng and turn the placement into a taxonomy with gappa.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="assign_placement_pq.html">assign_placement_pq()</a></code>
+
+        </dt>
+        <dd>Assign a taxonomy from a phylogenetic placement</dd>
+
+        <dt>
+
+          <code><a href="place_pq.html">place_pq()</a></code>
+
+        </dt>
+        <dd>Place the reference sequences of a phyloseq object on a reference tree</dd>
+
+        <dt>
+
+          <code><a href="print.phylopq_refpkg.html">print(<i>&lt;phylopq_refpkg&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print a reference package</dd>
+
+        <dt>
+
+          <code><a href="ref_package_pq.html">ref_package_pq()</a></code>
+
+        </dt>
+        <dd>Assemble a reference package for phylogenetic placement</dd>
+      </dl></div><div class="section level2">
+      <h2 id="external-programs">External programs<a class="anchor" aria-label="anchor" href="#external-programs"></a></h2>
+
+      <div class="section-desc"><p>Check for and install the command-line programs the functions above drive.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="install_abgd.html">install_abgd()</a></code>
+
+        </dt>
+        <dd>Install the ABGD species-delimitation program</dd>
+
+        <dt>
+
+          <code><a href="install_asap.html">install_asap()</a></code>
+
+        </dt>
+        <dd>Install the ASAP species-delimitation program</dd>
+
+        <dt>
+
+          <code><a href="install_epang.html">install_epang()</a></code>
+
+        </dt>
+        <dd>Install the EPA-ng phylogenetic placement program</dd>
+
+        <dt>
+
+          <code><a href="install_gappa.html">install_gappa()</a></code>
+
+        </dt>
+        <dd>Install the gappa placement-analysis program</dd>
+
+        <dt>
+
+          <code><a href="is_delim_installed.html">is_delim_installed()</a></code>
+
+        </dt>
+        <dd>Is an ABGD or ASAP executable available?</dd>
+
+        <dt>
+
+          <code><a href="is_epang_installed.html">is_epang_installed()</a></code>
+
+        </dt>
+        <dd>Is EPA-ng available?</dd>
+
+        <dt>
+
+          <code><a href="is_gappa_installed.html">is_gappa_installed()</a></code>
+
+        </dt>
+        <dd>Is gappa available?</dd>
+      </dl></div><div class="section level2">
+      <h2 id="re-exported-from-miscmetabar">Re-exported from MiscMetabar<a class="anchor" aria-label="anchor" href="#re-exported-from-miscmetabar"></a></h2>
+
+      <div class="section-desc"><p>Alignment helpers that live in MiscMetabar so that every pqverse package can reach them, and are re-exported here.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="reexports.html">reexports</a></code> <code><a href="reexports.html">align_pq</a></code> <code><a href="reexports.html">is_mafft_installed</a></code>
+
+        </dt>
+        <dd>Objects re-exported from MiscMetabar</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
@@ -88,7 +223,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

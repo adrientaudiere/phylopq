@@ -1,5 +1,7 @@
 # Convert taxonomy dataframe to phylogenetic tree
 
+[![lifecycle-experimental](https://img.shields.io/badge/lifecycle-experimental-orange)](https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle)
+
 Creates a phylo object from a taxonomy table with hierarchical taxonomic
 ranks as columns.
 
@@ -44,10 +46,6 @@ taxo2tree(
 ## Value
 
 A phylo object (ape package) representing the taxonomic tree.
-
-## Details
-
-[![lifecycle-experimental](https://img.shields.io/badge/lifecycle-experimental-orange)](https://adrientaudiere.github.io/MiscMetabar/articles/Rules.html#lifecycle)
 
 ## Author
 

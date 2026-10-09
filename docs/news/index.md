@@ -8,23 +8,186 @@
   phylopq standalone.
 - [`add_tree_pq()`](https://adrientaudiere.github.io/phylopq/reference/add_tree_pq.md)
   attaches a phylogenetic tree to a phyloseq object from a `phylo`
-  object, a Newick or Nexus file, or directly from the taxonomy with
-  [`taxo2tree()`](https://adrientaudiere.github.io/phylopq/reference/taxo2tree.md),
-  reconciling tip labels and taxa names explicitly (drop tips, prune
-  taxa) and optionally rooting, ladderizing and computing arbitrary
-  branch lengths.
+  object or a Newick or Nexus file, or from the taxonomy with
+  [`taxo2tree()`](https://adrientaudiere.github.io/phylopq/reference/taxo2tree.md)
+  when `use_taxo_to_build_tree = TRUE`, reconciling tip labels and taxa
+  names explicitly (drop tips, prune taxa) and optionally rooting,
+  ladderizing and computing arbitrary branch lengths.
+- [`align_pq()`](https://adrientaudiere.github.io/MiscMetabar/reference/align_pq.html)
+  and
+  [`is_mafft_installed()`](https://adrientaudiere.github.io/MiscMetabar/reference/is_mafft_installed.html)
+  now live in `MiscMetabar` and are re-exported here, so
+  [`phylopq::align_pq()`](https://adrientaudiere.github.io/MiscMetabar/reference/align_pq.html)
+  keeps working unchanged. They were introduced in phylopq, but
+  MiscMetabar must keep working on its own and therefore cannot depend
+  on phylopq, while every pqverse package already depends on
+  MiscMetabar; moving them down makes the MAFFT backend reachable
+  everywhere rather than only from phylopq. The only visible change is
+  the option holding the path to the executable, renamed from
+  `phylopq.mafftpath` to `MiscMetabar.mafftpath`.
+- [`assign_placement_pq()`](https://adrientaudiere.github.io/phylopq/reference/assign_placement_pq.md)
+  turns the `.jplace` file of
+  [`place_pq()`](https://adrientaudiere.github.io/phylopq/reference/place_pq.md)
+  into a taxonomy with `gappa examine assign`, giving each query the
+  consensus taxonomic path of the reference tips around the branch it
+  was placed on, so a query falling deep inside a well-sampled clade is
+  resolved to a fine rank and one placed near the root only to a coarse
+  one. gappa reports one row per query *and per taxonomic depth*, each
+  carrying the likelihood weight accumulated over that clade, so the
+  assignment kept is the deepest row still clearing `min_alwr` (default
+  0.5) and that weight is returned alongside it in an `alwr` column;
+  raising `min_alwr` gives coarser but safer assignments. The
+  `--per-query-results` flag is always passed, because gappa writes the
+  `per_query.tsv` this reads only when asked to, while the `profile.tsv`
+  it writes by default aggregates over the whole sample and carries no
+  query names. Queries gappa leaves unassigned keep a row of `NA` rather
+  than being dropped, and the result is returned as a table or written
+  straight into the `tax_table` of a phyloseq object.
+- [`delim_multi_pq()`](https://adrientaudiere.github.io/phylopq/reference/delim_multi_pq.md)
+  runs ABGD across a range of relative gap widths and ASAP once, joins
+  the partitions into a single table and displays them side by side
+  along a phylogenetic tree with
+  [`delimtools::delim_autoplot()`](https://legallab.github.io/delimtools/reference/delim_autoplot.html),
+  so that the stability of a delimitation can be judged instead of a
+  single run trusted. Each run is submitted to
+  [`delimtools::delim_join()`](https://legallab.github.io/delimtools/reference/delim_join.html)
+  under a digit-free alias, because that function strips every digit
+  from the delimitation names and would otherwise collapse
+  `abgd_slope0.5` and `abgd_slope1.5` into a single column; the
+  user-facing names are restored afterwards. The tree is converted to a
+  `treedata` object carrying the `support` and `posterior` columns
+  [`delimtools::delim_autoplot()`](https://legallab.github.io/delimtools/reference/delim_autoplot.html)
+  reads and a plain `phylo` lacks, and the alignment is computed once
+  and shared by every run.
 - [`delim_pq()`](https://adrientaudiere.github.io/phylopq/reference/delim_pq.md)
   delimits species from the `refseq` slot with ABGD or ASAP through the
   `delimtools` package, aligning the sequences when needed and merging
   taxa of the same partition;
   [`is_delim_installed()`](https://adrientaudiere.github.io/phylopq/reference/is_delim_installed.md)
-  reports whether the external executable is available.
+  reports whether the external executable is available. ASAP is invoked
+  directly and its partition file located by pattern, because
+  [`delimtools::asap_tbl()`](https://legallab.github.io/delimtools/reference/asap_tbl.html)
+  guesses a filename current ASAP builds do not use and then silently
+  falls back to placing every sequence in one partition; each run also
+  gets its own output folder, so a run that produces nothing cannot
+  inherit the previous run’s partitions. A delimitation that yields a
+  single partition now reports that no barcode gap was found, and for
+  ABGD suggests a lower `slope`, rather than failing inside
+  [`merge_taxa_vec()`](https://adrientaudiere.github.io/MiscMetabar/reference/merge_taxa_vec.html).
+  [`delim_pq()`](https://adrientaudiere.github.io/phylopq/reference/delim_pq.md)
+  also gains an `align_method` argument, so the reference sequences can
+  be aligned with MAFFT instead of DECIPHER.
+- [`install_abgd()`](https://adrientaudiere.github.io/phylopq/reference/install_abgd.md)
+  and
+  [`install_asap()`](https://adrientaudiere.github.io/phylopq/reference/install_asap.md)
+  download, compile and install the ABGD and ASAP executables into the
+  phylopq user data directory. Because the authors’ server
+  (`bioinfo.mnhn.fr`) is currently unreachable, each function tries
+  several sources in turn: the Internet Archive copy of the last
+  official ABGD tarball, the iTaxoTools mirrors, and finally the
+  canonical URL, so they recover by themselves if that server returns.
+  The iTaxoTools ASAP sources carry a `wrapio.h` header redirecting
+  stdio to Python, which breaks the command-line build; phylopq
+  neutralises it in a throwaway copy of the sources before running
+  `make`. `src` accepts a URL, a local archive or a local source
+  directory for a fully manual install, and is always copied rather than
+  built in place.
+  [`delim_pq()`](https://adrientaudiere.github.io/phylopq/reference/delim_pq.md)
+  and
+  [`is_delim_installed()`](https://adrientaudiere.github.io/phylopq/reference/is_delim_installed.md)
+  now resolve those programs in three steps — the `phylopq.abgdpath` /
+  `phylopq.asappath` option, then a copy installed by these functions,
+  then the system `PATH` — so an installed binary is found without
+  editing `PATH`.
+- [`install_epang()`](https://adrientaudiere.github.io/phylopq/reference/install_epang.md)
+  and
+  [`install_gappa()`](https://adrientaudiere.github.io/phylopq/reference/install_gappa.md)
+  clone, compile and install the EPA-ng and gappa executables into the
+  phylopq user data directory, where
+  [`is_epang_installed()`](https://adrientaudiere.github.io/phylopq/reference/is_epang_installed.md)
+  and
+  [`is_gappa_installed()`](https://adrientaudiere.github.io/phylopq/reference/is_gappa_installed.md)
+  look for them. Both programs carry the `genesis` library as a git
+  submodule, which a GitHub release tarball does not contain, so they
+  are fetched with a recursive `git clone` and built with cmake rather
+  than from an archive as ABGD and ASAP are;
+  `conda install -c bioconda epa-ng` remains the quicker route when
+  conda is available.
+  [`install_epang()`](https://adrientaudiere.github.io/phylopq/reference/install_epang.md)
+  also needs `bison` and `flex`, because the bundled `libpll` generates
+  a parser, and checks for them before cloning rather than letting cmake
+  fail minutes later with an unhelpful
+  `Unknown CMake command "BISON_TARGET"`.
+- [`is_epang_installed()`](https://adrientaudiere.github.io/phylopq/reference/is_epang_installed.md)
+  and
+  [`is_gappa_installed()`](https://adrientaudiere.github.io/phylopq/reference/is_gappa_installed.md)
+  report whether the external placement programs are available,
+  resolving them in three steps like
+  [`is_delim_installed()`](https://adrientaudiere.github.io/phylopq/reference/is_delim_installed.md):
+  the `phylopq.epangpath` / `phylopq.gappapath` option, then a copy
+  installed by
+  [`install_epang()`](https://adrientaudiere.github.io/phylopq/reference/install_epang.md)
+  /
+  [`install_gappa()`](https://adrientaudiere.github.io/phylopq/reference/install_gappa.md),
+  then the system `PATH`.
 - [`phylo_glom_pq()`](https://adrientaudiere.github.io/phylopq/reference/phylo_glom_pq.md)
   agglomerates taxa closer than a cophenetic distance threshold,
   returning either the merged phyloseq object or the taxa-to-cluster
   mapping, and
   [`phylo_glom_scan_pq()`](https://adrientaudiere.github.io/phylopq/reference/phylo_glom_scan_pq.md)
   reports the number of resulting taxa across a range of thresholds.
+- [`place_pq()`](https://adrientaudiere.github.io/phylopq/reference/place_pq.md)
+  places the reference sequences of a phyloseq object on a fixed
+  reference phylogeny with EPA-ng, rather than building a tree from
+  metabarcoding reads that short markers rarely support. The three steps
+  are chained: the queries are aligned into the reference alignment with
+  `mafft --add --keeplength`, so that they land on exactly the
+  reference’s columns as EPA-ng requires; EPA-ng writes a `.jplace`
+  file; and that file is read back with
+  [`BoSSA::read_jplace()`](https://rdrr.io/pkg/BoSSA/man/read_jplace.html)
+  and flattened into a data.frame carrying the likelihood weight ratio
+  of each placement. It accepts either a `refpkg` from
+  [`ref_package_pq()`](https://adrientaudiere.github.io/phylopq/reference/ref_package_pq.md)
+  or a separate `ref_alignment` and `ref_tree`, and `query_taxa` /
+  `exclude_taxa` select which taxa are placed — so the reference may be
+  fully external, built from external sequences, or mixed, with a few
+  securely identified taxa of the dataset moved into the reference to
+  thicken the clade the queries fall into and then excluded from the
+  queries. `cmd_is_run = FALSE` returns the commands instead of running
+  them, so the workflow can be inspected without the external programs
+  installed.
+- [`ref_package_pq()`](https://adrientaudiere.github.io/phylopq/reference/ref_package_pq.md)
+  assembles the reference alignment and reference tree that
+  [`place_pq()`](https://adrientaudiere.github.io/phylopq/reference/place_pq.md)
+  needs, from sequences that normally come from outside the phyloseq
+  object. The two halves answer to different constraints: the alignment
+  must cover the same marker the primers amplify, whereas the tree is
+  taken as fixed and never re-estimated, so it is the right place to
+  inject evidence a single barcode cannot carry — a multi-locus
+  phylogeny, or a topology constrained by morphology and ecology in an
+  integrative-taxonomy study. Pass such a tree through `tree` and only
+  the alignment is built; leave it NULL and a `"nj"`, `"upgma"` or
+  `"ml"` tree is inferred from the barcode alone, which is the weakest
+  kind of reference. Tips and sequences are reconciled explicitly
+  (`drop_tips`, `drop_seqs`), and a tree whose labels look unrelated to
+  the sequences is reported rather than silently reduced.
+- [`ssn_glom_pq()`](https://adrientaudiere.github.io/phylopq/reference/ssn_glom_pq.md)
+  groups taxa into network sequence clusters (NSC) following the
+  sequence-similarity network approach of Forster et al. (2019): all
+  pairs of reference sequences are compared with
+  `vsearch --allpairs_global`, every pair at least `id` similar becomes
+  an edge, and each connected component of the resulting graph is one
+  cluster. Because a component is a single-linkage group, a cluster can
+  be much wider than `id`, which is the point of the method but also
+  makes it sensitive to the threshold; taxa vsearch reports no hit for
+  form their own single-taxon cluster, so no abundance is lost. The
+  network itself is available with `return_graph = TRUE`.
+- [`ssn_glom_scan_pq()`](https://adrientaudiere.github.io/phylopq/reference/ssn_glom_scan_pq.md)
+  reports the number of network sequence clusters across a range of
+  similarity thresholds before committing to one, running vsearch once
+  at the lowest threshold and filtering the resulting identities at each
+  of the others, so scanning twenty thresholds costs one alignment run
+  rather than twenty.
 
 ## phylopq 0.1.0
 
